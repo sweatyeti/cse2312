@@ -10,19 +10,16 @@
 main:
 
     /* prompt for and get the 1st operand from user */
-
     LDR R0,=operand1_prompt_str
     BL printf
     BL getOperand
     MOV R4, R0
     
     /* prompt for and get the operation type from user, w/ checks included */
-    
     BL getOperation
     MOV R5, R0
     
     /* prompt for and get the 2nd operand from user */
-    
     LDR R0,=operand2_prompt_str
     BL printf
     BL getOperand
@@ -62,8 +59,8 @@ getOperand:
 getOperation:
     PUSH {LR}                       @ preserve the initial LR on the stack, and adjust SP
     SUB SP, SP, #4                  
-	LDR R0,=opType_prompt_str
-	BL printf                       @ display the operation type prompt
+    LDR R0,=opType_prompt_str
+    BL printf                       @ display the operation type prompt
 
     LDR R0, =opType_format_str
     MOV R1, SP              		@ move SP to R1 to store user input on stack
