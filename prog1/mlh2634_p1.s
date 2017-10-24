@@ -9,55 +9,55 @@
 
 main:
 
-    @@ prompt for and get the 1st operand from user
+    /* prompt for and get the 1st operand from user */
 
-	LDR R0,=operand1_prompt_str
-	BL printf
-	BL getOperand
-	MOV R4, R0
-	
-    @@ prompt for and get the operation type from user, w/ checks included
+    LDR R0,=operand1_prompt_str
+    BL printf
+    BL getOperand
+    MOV R4, R0
     
-	BL getOperation
-	MOV R5, R0
-	
-    @@ prompt for and get the 2nd operand from user
+    /* prompt for and get the operation type from user, w/ checks included */
     
-	LDR R0,=operand2_prompt_str
-	BL printf
-	BL getOperand
-	MOV R6, R0
+    BL getOperation
+    MOV R5, R0
+    
+    /* prompt for and get the 2nd operand from user */
+    
+    LDR R0,=operand2_prompt_str
+    BL printf
+    BL getOperand
+    MOV R6, R0
 	
-    @@ Store operands in appropriate registers
+    /* Store operands in appropriate registers */
     MOV R1, R4
     MOV R2, R6
     
-    @@ Determine which operation user entered, and execute it
+    /* Determine which operation user entered, and execute it */
     CMP R5, #'+'
-	BLEQ SUM
-    BEQ outputResultAndStartOver
-	
-	CMP R5, #'-'
-	BLEQ DIFFERENCE
+    BLEQ SUM
     BEQ outputResultAndStartOver
     
-	CMP R5, #'*'
-	BLEQ PRODUCT
+    CMP R5, #'-'
+    BLEQ DIFFERENCE
+    BEQ outputResultAndStartOver
+    
+    CMP R5, #'*'
+    BLEQ PRODUCT
     BEQ outputResultAndStartOver
     
     CMP R5, #'M'
-	BLEQ MAX
+    BLEQ MAX
     BEQ outputResultAndStartOver
 
 getOperand:
-	PUSH {LR}
-	SUB SP, SP, #4
-	LDR R0, =operand_format_str
-	MOV R1, SP
-	BL scanf
-	LDR R0, [SP]
-	ADD SP, SP, #4
-	POP {PC}
+    PUSH {LR}
+    SUB SP, SP, #4
+    LDR R0, =operand_format_str
+    MOV R1, SP
+    BL scanf
+    LDR R0, [SP]
+    ADD SP, SP, #4
+    POP {PC}
 
 getOperation:
     PUSH {LR}                       @ preserve the initial LR on the stack, and adjust SP
@@ -72,30 +72,30 @@ getOperation:
     ADD SP, SP, #4
     POP {LR}                        @ restore the original return addr back its spot
     
-    @@ check user input for one of the supported types
-    @@ if a match is found then return to caller
+    /* check user input for one of the supported types
+    ** if a match is found then return to caller */
     
     CMP R0, #'+'
-	MOVEQ PC, LR
+    MOVEQ PC, LR
 	
-	CMP R0, #'-'
-	MOVEQ PC, LR
+    CMP R0, #'-'
+    MOVEQ PC, LR
 	
-	CMP R0, #'*'
-	MOVEQ PC, LR
+    CMP R0, #'*'
+    MOVEQ PC, LR
 	
-	CMP R0, #'M'
-	MOVEQ PC, LR
+    CMP R0, #'M'
+    MOVEQ PC, LR
 	
-	@@ we only get to this point if user input doesn't match supported ops
-	@@ alert the user, then re-start routine to allow the user to try again
+    /* we only get to this point if user input doesn't match supported ops
+    ** alert the user, then re-start routine to allow the user to try again */
 	
-	PUSH {LR}                       @ preserve initial LR on the stack and adjust SP
+    PUSH {LR}                       @ preserve initial LR on the stack and adjust SP
     SUB SP, SP, #4
-	LDR R0, =incorrect_opType_str
-	BL printf                       @ display the message informing user of incorrect opType
+    LDR R0, =incorrect_opType_str
+    BL printf                       @ display the message informing user of incorrect opType
     ADD SP, SP, #4
-	POP {LR}                        @ store initial LR back into R14
+    POP {LR}                        @ store initial LR back into R14
 	
     B getOperation
 
@@ -121,14 +121,14 @@ outputResultAndStartOver:
     MOV R2, R5              @ move opType into R2 to prepare for printf call
     PUSH {R0}              @ Push the operation's result onto the stack for printf to consume
     LDR R0,=output_str
-	BL printf
+    BL printf
     ADD SP, SP, #4          @ move stack pointer back to proper place
 	
-	B main				@ start the whole process over again
+    B main				@ start the whole process over again
 
 _exit:
-	MOV R7, #1          @ terminate syscall, 1
-	SWI 0               @ execute syscall
+    MOV R7, #1          @ terminate syscall, 1
+    SWI 0               @ execute syscall
 
 
 
