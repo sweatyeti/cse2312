@@ -49,10 +49,10 @@ main:
 
 
 /******
-name: getOperand
-parameters: none
-returns: operand in R0
-description: retrieves one operand from the user
+* name: getOperand
+* parameters: none
+* returns: operand in R0
+* description: retrieves one operand from the user
 ******/
 getOperand:
     PUSH {LR}
@@ -66,10 +66,10 @@ getOperand:
 
 
 /******
-name: getOperation
-parameters: none
-returns: operation type in R0
-description: retrieves the desired operation type from the user and performs a rudimentary validity check.
+* name: getOperation
+* parameters: none
+* returns: operation type in R0
+* description: retrieves the desired operation type from the user and performs a rudimentary validity check.
     If the provided opType input doesn't match one of the 4 we're looking for, then re-prompt the user for a new one.
 ******/
 getOperation:
@@ -114,10 +114,10 @@ getOperation:
 
 
 /******
-name: SUM
-parameters: operands in R1 and R2
-returns: result in R0
-description: calculates the sum of the operands
+* name: SUM
+* parameters: operands in R1 and R2
+* returns: result in R0
+* description: calculates the sum of the operands
 ******/
 SUM:
     ADD R0, R1, R2
@@ -125,11 +125,10 @@ SUM:
 
 
 /****** 
-name: DIFFERENCE
-returns: result in R0
-parameters: operands in R1 and R2
-returns: result in R0
-description: calculates the difference of the operands
+* name: DIFFERENCE
+* parameters: operands in R1 and R2
+* returns: result in R0
+* description: calculates the difference of the operands
 ******/
 DIFFERENCE:
     SUB R0, R1, R2
@@ -137,10 +136,10 @@ DIFFERENCE:
 
 
 /****** 
-name: PRODUCT
-parameters: operands in R1 and R2
-returns: result in R0
-description: calculates the product of the operands
+* name: PRODUCT
+* parameters: operands in R1 and R2
+* returns: result in R0
+* description: calculates the product of the operands
 ******/
 PRODUCT:
     MUL R0, R1, R2
@@ -148,10 +147,10 @@ PRODUCT:
 
 
 /****** 
-name: MAX
-parameters: operands in R1 and R2
-returns: result in R0
-description: calculates the max value of the operands
+* name: MAX
+* parameters: operands in R1 and R2
+* returns: result in R0
+* description: calculates the max value of the operands
 ******/
 MAX:
     CMP R1, R2
@@ -160,14 +159,14 @@ MAX:
 
 
 /****** 
-name: outputResultAndStartOver
-parameters: 
- 1. left operand in R1
- 2. right operand in R2
- 3. operation type in R3
- 4. calculation result in R0
-returns: n/a
-description: take the inputs and result of the calculation and output it, then start the program over by branching back to main
+* name: outputResultAndStartOver
+* parameters: 
+*  1. left operand in R1
+*  2. right operand in R2
+*  3. operation type in R3
+*  4. calculation result in R0
+* returns: n/a
+* description: take the inputs and result of the calculation and output it, then start the program over by branching back to main
 ******/
 outputResultAndStartOver:
     PUSH {R4}               @ preserve R4 on the stack since this function modifies it
@@ -185,10 +184,10 @@ outputResultAndStartOver:
 
 
 /****** 
-name: _exit
-parameters: none
-returns: n/a
-description: currently-unused exit function
+* name: _exit
+* parameters: none
+* returns: n/a
+* description: currently-unused exit function
 ******/
 _exit:
     MOV R7, #1              @ terminate syscall, 1
