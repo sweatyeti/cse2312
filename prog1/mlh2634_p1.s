@@ -10,7 +10,7 @@
 main:
 
     /* prompt for and get the 1st operand from user */
-    LDR R0,=operand1_prompt_str
+    LDR R0, =operand1_prompt_str
     BL printf
     BL getOperand
     MOV R4, R0
@@ -20,7 +20,7 @@ main:
     MOV R5, R0
     
     /* prompt for and get the 2nd operand from user */
-    LDR R0,=operand2_prompt_str
+    LDR R0, =operand2_prompt_str
     BL printf
     BL getOperand
     MOV R6, R0
@@ -57,15 +57,15 @@ getOperand:
     POP {PC}
 
 getOperation:
-    PUSH {LR}                       @ preserve the initial LR on the stack, and adjust SP
-    SUB SP, SP, #4                  
+    PUSH {LR}
+    SUB SP, SP, #4
     LDR R0,=opType_prompt_str
-    BL printf                       @ display the operation type prompt
+    BL printf
 
     LDR R0, =opType_format_str
-    MOV R1, SP              		@ move SP to R1 to store user input on stack
+    MOV R1, SP                      @ move SP to R1 to store user input on stack
     BL scanf                        @ get the user input for operation type
-    LDR R0, [SP]            		@ load user's input into R0, and adjust SP
+    LDR R0, [SP]                    @ load user's input into R0, and adjust SP
     ADD SP, SP, #4
     POP {LR}                        @ restore the original return addr back its spot
     
@@ -87,12 +87,12 @@ getOperation:
     /* we only get to this point if user input doesn't match supported ops
     ** alert the user, then re-start routine to allow the user to try again */
 	
-    PUSH {LR}                       @ preserve initial LR on the stack and adjust SP
+    PUSH {LR} 
     SUB SP, SP, #4
     LDR R0, =incorrect_opType_str
-    BL printf                       @ display the message informing user of incorrect opType
+    BL printf
     ADD SP, SP, #4
-    POP {LR}                        @ store initial LR back into R14
+    POP {LR}
 	
     B getOperation
 
@@ -117,11 +117,11 @@ outputResultAndStartOver:
     MOV R3, R2              @ move operand2 into R3 to prepare for printf call (operand1 is already in R1, so it's good)
     MOV R2, R5              @ move opType into R2 to prepare for printf call
     PUSH {R0}              @ Push the operation's result onto the stack for printf to consume
-    LDR R0,=output_str
+    LDR R0, =output_str
     BL printf
     ADD SP, SP, #4          @ move stack pointer back to proper place
 	
-    B main				@ start the whole process over again
+    B main                  @ start the whole process over again
 
 _exit:
     MOV R7, #1          @ terminate syscall, 1
