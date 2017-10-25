@@ -15,7 +15,7 @@ main:
     BL getOperand
     MOV R4, R0
     
-    /* prompt for and get the operation type from user, w/ checks included */
+    /* prompt for and get the operation type from user */
     BL getOperation
     MOV R5, R0
     
@@ -25,12 +25,12 @@ main:
     BL getOperand
     MOV R6, R0
 	
-    /* Store operands and opType in appropriate registers */
+    /* Store operands and opType in appropriate registers to be passed as params */
     MOV R1, R4
     MOV R2, R6
     MOV R3, R5
     
-    /* Determine which operation user entered, and execute it, then output the result and start over */
+    /* Determine which operation user entered, execute it, then output the result and start over */
     CMP R3, #'+'
     BLEQ SUM
     BEQ outputResultAndStartOver
@@ -100,7 +100,7 @@ getOperation:
     CMP R0, #'M'
     MOVEQ PC, LR
 	
-    /* we only get to this point if user input doesn't match supported ops
+    /* we only get to this point if user input doesn't match supported opTypes
     ** alert the user, then re-start routine to allow the user to try again */
 	
     PUSH {LR} 
@@ -117,7 +117,7 @@ getOperation:
 * name: SUM
 * parameters: operands in R1 and R2
 * returns: result in R0
-* description: calculates the sum of the operands
+* description: returns the sum of the operands
 ******/
 SUM:
     ADD R0, R1, R2
@@ -128,7 +128,7 @@ SUM:
 * name: DIFFERENCE
 * parameters: operands in R1 and R2
 * returns: result in R0
-* description: calculates the difference of the operands
+* description: returns the difference of the operands (R1-R2)
 ******/
 DIFFERENCE:
     SUB R0, R1, R2
@@ -139,7 +139,7 @@ DIFFERENCE:
 * name: PRODUCT
 * parameters: operands in R1 and R2
 * returns: result in R0
-* description: calculates the product of the operands
+* description: returns the product of the operands
 ******/
 PRODUCT:
     MUL R0, R1, R2
@@ -150,7 +150,7 @@ PRODUCT:
 * name: MAX
 * parameters: operands in R1 and R2
 * returns: result in R0
-* description: calculates the max value of the operands
+* description: returns the max value of the operands
 ******/
 MAX:
     CMP R1, R2
@@ -166,20 +166,20 @@ MAX:
 *  3. operation type in R3
 *  4. calculation result in R0
 * returns: n/a
-* description: take the inputs and result of the calculation and output it, then start the program over by branching back to main
+* description: take the inputs and result of the calculation and output them, then start the program over by branching back to main
 ******/
 outputResultAndStartOver:
-    PUSH {R4}               @ preserve R4 on the stack since this function modifies it
+    PUSH {R4}               @ preserve R4 on the stack since this function modifies it (not necessary, but R4+ must be preserved across calls)
     SUB SP, SP, #4
     MOV R4, R2              @ save right operand (R2) into R4 to preserve it while we shift register values around
     MOV R2, R3              @ move opType (R3) into R2 to prepare for printf call
-    MOV R3, R4              @ move operand2 (R2) into R3 to prepare for printf call (left operand is already in R1, so it's good)
-    PUSH {R0}               @ Push the operation's result onto the stack for printf to consume
+    MOV R3, R4              @ move right operand (R4) into R3 to prepare for printf call (left operand is already in R1, so it's good)
+    PUSH {R0}               @ Push the result onto the stack for printf to consume as the 4th parameter
     LDR R0, =output_str
-    BL printf
-    ADD SP, SP, #4          @ move stack pointer back to proper place
+    BL printf               @ output the summary & result string
+    ADD SP, SP, #4          @ adjust stack pointer to reveal original pushed R4
     POP {R4}                @ return original R4 value back to R4
-    ADD SP, SP, #4
+    ADD SP, SP, #4          @ adjust stack pointer
     B main                  @ start the whole process over again
 
 
@@ -203,4 +203,3 @@ operand_format_str: 	.asciz "%d"
 incorrect_opType_str:	.asciz "Operation type not accepted.\n"
 opType_format_str:		.asciz "%s"
 output_str:             .asciz "You entered %d %c %d.\nThe result is %d.\n\n"
-test_str:               .asciz "test_str"
