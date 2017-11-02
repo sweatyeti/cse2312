@@ -21,7 +21,7 @@ _createarray:
     POP {R2}                @ restore curent array pointer to R2
     STR R0, [R2]            @ store rand# to array location
     ADD R5, R5, #1          @ increment counter
-    B _createarray
+    B _createarray          @ loop back
 
 _createarraydone:
     MOV R5, #0              @ reset counter back to zero
@@ -31,10 +31,16 @@ _iteratearray:
     LDR R1, =a              @ load R1 with pointer to a
     LSL R2, R5, #2          @ multiply counter*4, product = the array offset
     ADD R2, R1, R2          @ R2 = address of a + array offset
-    LDR R1, [R2]            @ R1 = the value stored at the memory address in R2
-    
+    LDR R3, [R2]            @ R3 = the value stored at the memory address in R2
+    LDR R0, =output_str     @ R0 = addr of output string to prepare for _printf
+    MOV R1, R5              @ load the counter into R1 to prepare for _printf
+    MOV R2, R3              @ load the rand # into R2 to prepare for _printf
+    BL _printf              @ print all the things
+    ADD R5, R5, #1          @ increment the counter
+    B _iteratearray         @ loop back
 
-    B _exit
+_iteratearraydone:
+    B _exit                 @die
 
 _seedrand:
     PUSH {LR}               @ backup return address
