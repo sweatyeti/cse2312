@@ -35,8 +35,7 @@ _iteratearray:
     ADD R2, R1, R2          @ R2 = address of a + array offset
     LDR R3, [R2]            @ R3 = the value stored at the memory address in R2  
     MOV R1, R3              @ load the rand # into R1 for call to _checkmaxmin
-    BL _checkmaxmin
-    
+    BL _checkmaxmin         @ make necessary max/min check
     LDR R0, =output_str     @ R0 = addr of output string to prepare for _printf
     MOV R1, R5              @ load the counter into R1 to prepare for _printf
     MOV R2, R3              @ load the rand # into R2 to prepare for _printf
@@ -45,26 +44,23 @@ _iteratearray:
     B _iteratearray         @ loop back
 
 _iteratearraydone:
-    BL _printmaxmin         @ output the max/min strings
-    B _exit                 @die
+    B _printmaxmin          @ output the max/min strings
 
 _checkmaxmin:
-    PUSH {LR}
     CMP R1, R6              @ compare the # against the current min #
-    MOVLT R6, R1            @ rand # < current MIN, so update the current MIN
+    MOVLT R6, R1            @ if rand# < current MIN, update the MIN
     CMP R1, R7              @ compare the # against the current max #
-    MOVGT R7, R1            @ rand # > current MAX, to update the current MAX
-    POP {PC}
+    MOVGT R7, R1            @ if rand# > current MAX, update the MAX
+    MOV PC, LR
     
 _printmaxmin:
-    PUSH {LR}
     LDR R0, =min_str        @ R0 = addr of min value output string
     MOV R1, R6              @ R1 = the minimum value
     BL _printf              @ print the min string
     LDR R0, =max_str        @ R0 = addr of max value output string
     MOV R1, R7              @ R1 = the max value
     BL _printf              @ print the max string
-    POP {PC}
+    B _exit                 @die
 
 _seedrand:
     PUSH {LR}               @ backup return address
@@ -77,8 +73,8 @@ _seedrand:
 _getrand:
     PUSH {LR}               @ backup return address
     BL rand                 @ get a random number
-    CMP R0, #1000
-    POPLT {PC}
+    CMP R0, #1000           @ check if the rand# is within range
+    POPLT {PC}              @ return if so, continue if not
     MOV R1, R0
     B _fixrand              @ if the rand# is >= 1000, we need to fix it to be [0-999]
 
@@ -95,17 +91,16 @@ _fixrand:                   @ this is a slightly-modified version of C.McMurroug
     MOV R0, R1              @ move remainder to R0
     POP {PC}                @ return
 
-_printf:                    @ needs R0 address, plus any parameters, to be set by the caller
+_printf:                    @ needs R0 address, plus any parameters, to be set by the caller beforehand
     PUSH {LR} 
     SUB SP, SP, #4
     BL printf                       
     ADD SP, SP, #4
     POP {PC}
 
-_exit:
-    MOV R7, #1              @ terminate syscall, 1
-    SWI 0                   @ execute syscall
-    
+_exit:                      @die
+    MOV R7, #1
+    SWI 0
     
 
 .data
