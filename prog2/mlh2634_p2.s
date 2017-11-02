@@ -26,6 +26,12 @@ _createarray:
 _createarraydone:
     MOV R5, #0              @ reset counter back to zero
 _iteratearray:
+    CMP R5, #10             @ check counter to see if the loop is finished
+    BEQ _iteratearraydone   @ if finished, exit loop
+    LDR R1, =a              @ load R1 with pointer to a
+    LSL R2, R5, #2          @ multiply counter*4, product = the array offset
+    ADD R2, R1, R2          @ R2 = address of a + array offset
+    LDR R1, [R2]            @ R1 = the value stored at the memory address in R2
     
 
     B _exit
