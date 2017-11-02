@@ -9,15 +9,24 @@
 
 main:
     BL _seedrand            @ seed random number generator with current time
+    MOV R5, #0              @ init counter for _createarray loop
+_createarray:
+    CMP R5, #10             @ check counter to see if the loop is finished
+    BEQ _createarraydone    @ if finished, exit loop
+    LDR R1, =a              @ load R1 with pointer to a
+    LSL R2, R5, #2          @ multiply counter*4, product = the array offset
+    ADD R2, R1, R2          @ R2 = address of a + array offset
+    PUSH {R2}               @ backup R2 on the stack for later retrieval
     BL _getrand             @ get a random #
-    MOV R1, R0
+    POP {R2}                @ restore curent array pointer to R2
+    STR R0, [R2]            @ store rand# to array location
+    ADD R5, R5, #1          @ increment counter
+    B _createarray
+
+_createarraydone:
+    MOV R5, #0              @ reset counter back to zero
+_iteratearray:
     
-    PUSH {LR} 
-    SUB SP, SP, #4
-    LDR R0, =test_str
-    BL printf                       
-    ADD SP, SP, #4
-    POP {LR}
 
     B _exit
 
@@ -50,6 +59,13 @@ _fixrand:                   @ this is a slightly-modified version of C.McMurroug
     MOV R0, R1              @ move remainder to R0
     POP {PC}                @ return
 
+_printf:                    @ needs R0 address, plus any parameters, to be set by the caller
+    PUSH {LR} 
+    SUB SP, SP, #4
+    BL printf                       
+    ADD SP, SP, #4
+    POP {PC}
+
 _exit:
     MOV R7, #1              @ terminate syscall, 1
     SWI 0                   @ execute syscall
@@ -57,4 +73,6 @@ _exit:
     
 
 .data
-test_str: .asciz "%d\n"
+test_str:       .asciz "%d\n"
+a:              .skip 40
+output_str:     .asciz      "a[%d] = %d\n"
