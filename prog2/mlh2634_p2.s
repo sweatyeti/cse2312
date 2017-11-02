@@ -25,22 +25,46 @@ _createarray:
 
 _createarraydone:
     MOV R5, #0              @ reset counter back to zero
+    MOV R6, #1000           @ init reg for MIN value
+    MOV R7, #0              @ init reg for MAX value
 _iteratearray:
     CMP R5, #10             @ check counter to see if the loop is finished
     BEQ _iteratearraydone   @ if finished, exit loop
     LDR R1, =a              @ load R1 with pointer to a
     LSL R2, R5, #2          @ multiply counter*4, product = the array offset
     ADD R2, R1, R2          @ R2 = address of a + array offset
-    LDR R3, [R2]            @ R3 = the value stored at the memory address in R2
+    LDR R3, [R2]            @ R3 = the value stored at the memory address in R2  
+    MOV R1, R3              @ load the rand # into R1 for call to _checkmaxmin
+    BL _checkmaxmin
+    
     LDR R0, =output_str     @ R0 = addr of output string to prepare for _printf
     MOV R1, R5              @ load the counter into R1 to prepare for _printf
     MOV R2, R3              @ load the rand # into R2 to prepare for _printf
-    BL _printf              @ print all the things
+    BL _printf              @ print the things
     ADD R5, R5, #1          @ increment the counter
     B _iteratearray         @ loop back
 
 _iteratearraydone:
+    BL _printmaxmin         @ output the max/min strings
     B _exit                 @die
+
+_checkmaxmin:
+    PUSH {LR}
+    CMP R1, R6              @ compare the # against the current min #
+    MOVLT R6, R1            @ rand # < current MIN, so update the current MIN
+    CMP R1, R7              @ compare the # against the current max #
+    MOVGT R7, R1            @ rand # > current MAX, to update the current MAX
+    POP {PC}
+    
+_printmaxmin:
+    PUSH {LR}
+    LDR R0, =min_str        @ R0 = addr of min value output string
+    MOV R1, R6              @ R1 = the minimum value
+    BL _printf              @ print the min string
+    LDR R0, =max_str        @ R0 = addr of max value output string
+    MOV R1, R7              @ R1 = the max value
+    BL _printf              @ print the max string
+    POP {PC}
 
 _seedrand:
     PUSH {LR}               @ backup return address
@@ -85,6 +109,8 @@ _exit:
     
 
 .data
-test_str:       .asciz "%d\n"
-a:              .skip 40
+test_str:       .asciz      "%d\n"
+a:              .skip       40
 output_str:     .asciz      "a[%d] = %d\n"
+max_str:        .asciz      "MAXIMUM VALUE = %d\n"
+min_str:        .asciz      "MINIMUM VALUE = %d\n"
