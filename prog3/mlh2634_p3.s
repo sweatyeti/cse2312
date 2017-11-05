@@ -24,7 +24,18 @@ main:
 
     B _exit                         @die (unreachable)
 
-count_partitions:
+count_partitions:                   @ implement recursive logic for returning the # of partitions from the provided operands
+    PUSH {LR}
+    CMP R1, #0
+    MOVEQ R0, #1                    @ if (OpN == 0) then return 1
+    POPEQ {PC}
+    MOVLT R0, #0                    @ if (OpN < 0) then return 0
+    POPLT {PC}
+    CMP R2, #0
+    MOVEQ R0, #0                    @ if (OpM == 0) then return 0
+    POPEQ {PC}
+    PUSH {R1}
+    PUSH {R2}
     
     
 
