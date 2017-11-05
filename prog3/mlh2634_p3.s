@@ -34,8 +34,13 @@ count_partitions:                   @ implement recursive logic for returning th
     CMP R2, #0
     MOVEQ R0, #0                    @ if (OpM == 0) then return 0
     POPEQ {PC}
-    PUSH {R1}
-    PUSH {R2}
+    PUSH {R1}                       @ preserve orig R1
+    SUB R1, R1, R2                  @ prepare for first recursive call [count_partitions(n-m,m)]
+    BL count_partitions             @ first recursive call
+    POP {R1}                        @ restore orig R1
+    PUSH {R0}                       @ preserve call result
+    
+    
     
     
 
