@@ -9,23 +9,23 @@
 
 main:
     LDR R0, =out_operandN_str
-    BL _printf                      @ prompt user for operand N
+    BL _printf                      @ prompt user for operand N (OpN)
     LDR R0, =in_operand_format_str
-    BL _getOperand                  @ get operand N
-    MOV R4, R0                      @ preserve operand N
+    BL _getOperand                  @ get OpN
+    MOV R4, R0                      @ preserve OpN
     LDR R0, =out_operandM_str     
-    BL _printf                      @ prompt user for operand M
+    BL _printf                      @ prompt user for operand M (OpM)
     LDR R0, =in_operand_format_str
-    BL _getOperand                  @ get operand M
-    MOV R5, R0                      @ preserve operand M
-    MOV R1, R4                      @ R1 = operand N
-    MOV R2, R5                      @ R2 = operand M
+    BL _getOperand                  @ get OpM
+    MOV R5, R0                      @ preserve OpM
+    MOV R1, R4                      @ R1 = OpN
+    MOV R2, R5                      @ R2 = OpM
     BL count_partitions             @ perform partition logic
     PUSH {R0}
     LDR R0, =out_result_str         @ load output string addr for printf call
     POP {R1}                        @ R1 = end result (# of partitions)
-    MOV R2, R4                      @ R2 = operand N
-    MOV R3, R5                      @ R3 = operand M
+    MOV R2, R4                      @ R2 = OpN
+    MOV R3, R5                      @ R3 = OpM
     BL _printf                      @ output the result string
     B main                          @ do it all over
 
@@ -45,18 +45,18 @@ count_partitions:                   @ implement recursive logic for returning th
     SUB R1, R1, R2                  @ prepare for 1st recursive call [count_partitions(n-m,m)]
     BL count_partitions             @ 1st recursive call
     POP {R1}                        @ restore orig R1
-    PUSH {R0}                       @ preserve call result
+    PUSH {R0}                       @ preserve first recursive call result
     PUSH {R2}                       @ preserve orig OpM to prepare for 2nd recursive call [count_partitions(n,m-1)]
     SUB R2, R2, #1                  @ prep OpM for 2nd recursive call
     BL count_partitions             @ 2nd recursive call
     POP {R2}                        @ restore orig OpM
-    POP {R1}                        @ R1 = result of 1st recursive call
+    POP {R1}                        @ R1 = restored result of 1st recursive call
     ADD R0, R0, R1                  @ add results of both recursive calls into return reg R0
     POP {PC}
     
 
-_getOperand:                        @ needs addr of input format string to be set by caller beforehand
-    PUSH {LR}
+_getOperand:                        @ retrieves single operand from user using clib scanf
+    PUSH {LR}                       @ needs addr of input format string in R0 to be set by caller beforehand
     SUB SP, SP, #4
     MOV R1, SP
     BL scanf
@@ -65,8 +65,8 @@ _getOperand:                        @ needs addr of input format string to be se
     POP {PC}
 
 
-_printf:                            @ needs addr of output string in R0, plus any parameters, to be set by the caller beforehand
-    PUSH {LR} 
+_printf:                            @ outputs string to the screen using clib printf
+    PUSH {LR}                       @ needs addr of output string in R0, plus any parameters, to be set by the caller beforehand
     SUB SP, SP, #4
     BL printf                       
     ADD SP, SP, #4
