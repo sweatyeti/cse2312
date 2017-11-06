@@ -21,9 +21,9 @@ main:
     MOV R1, R4                      @ R1 = OpN
     MOV R2, R5                      @ R2 = OpM
     BL count_partitions             @ perform partition logic
-    PUSH {R0}
+    PUSH {R0}                       @ preserve result (final, # of partitions)
     LDR R0, =out_result_str         @ load output string addr for printf call
-    POP {R1}                        @ R1 = end result (# of partitions)
+    POP {R1}                        @ pop result from stack (from R0) into R1, to prepare for _printf call
     MOV R2, R4                      @ R2 = OpN
     MOV R3, R5                      @ R3 = OpM
     BL _printf                      @ output the result string
