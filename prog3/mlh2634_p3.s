@@ -8,14 +8,14 @@
 .func main
 
 main:
-    LDR R0, =operandN_str
+    LDR R0, =out_operandN_str
     BL _printf                      @ prompt user for operand N
-    LDR R0, =operand_format_str
+    LDR R0, =in_operand_format_str
     BL _getOperand                  @ get operand N
     MOV R4, R0                      @ preserve operand N
-    LDR R0, =operandM_str     
+    LDR R0, =out_operandM_str     
     BL _printf                      @ prompt user for operand M
-    LDR R0, =operand_format_str
+    LDR R0, =in_operand_format_str
     BL _getOperand                  @ get operand M
     MOV R5, R0                      @ preserve operand M
     MOV R1, R4                      @ R1 = operand N
@@ -34,14 +34,16 @@ count_partitions:                   @ implement recursive logic for returning th
     CMP R2, #0
     MOVEQ R0, #0                    @ if (OpM == 0) then return 0
     POPEQ {PC}
-    PUSH {R1}                       @ preserve orig R1
-    SUB R1, R1, R2                  @ prepare for first recursive call [count_partitions(n-m,m)]
-    BL count_partitions             @ first recursive call
+    PUSH {R1}                       @ preserve orig R1 for later use
+    SBC R1, R1, R2                  @ prepare for 1st recursive call [count_partitions(n-m,m)]
+    BL count_partitions             @ 1st recursive call
     POP {R1}                        @ restore orig R1
     PUSH {R0}                       @ preserve call result
-    
-    
-    
+    SBC R2, R2, #1                  @ prepare for 2nd recursive call [count_partitions(n,m-1)]
+    BL count_partitions             @ 2nd recursive call
+    POP {R1}                        @ R1 = result of 1st recursive call
+    ADD R0, R0, R1                  @ add results of both recursive calls into return reg R0
+    POP {PC}
     
 
 _getOperand:                        @ needs addr of input format string to be set by caller beforehand
@@ -62,11 +64,16 @@ _printf:                            @ needs addr of output string in R0, plus an
     POP {PC}
 
 _exit:                              @die
+    LDR R0, =out_end_str
+    BL _printf
     MOV R7, #1
     SWI 0
     
 
 .data
-operandN_str:           .asciz      "Enter a positive integer then press ENTER (operand N):\n"
-operandM_str:           .asciz      "Enter the largest integer part then press ENTER (operand M):\n"
-operand_format_str:     .asciz      "%d"
+out_test_str:               .asciz      "R1: %d, R2: %d, R3: %d\n"
+out_end_str:                .asciz      "terminating prog.."
+out_operandN_str:           .asciz      "Enter a positive integer then press ENTER (operand N):\n"
+out_operandM_str:           .asciz      "Enter the largest integer part then press ENTER (operand M):\n"
+in_operand_format_str:      .asciz      "%d"
+out_result_str:             .asciz      "There are %d partitions of %d using integers up to %d.\n"
