@@ -21,6 +21,7 @@ main:
     MOV R1, R4                      @ R1 = operand N
     MOV R2, R5                      @ R2 = operand M
     BL count_partitions             @ perform partition logic
+    
 
     B _exit                         @die (unreachable)
 
@@ -39,8 +40,10 @@ count_partitions:                   @ implement recursive logic for returning th
     BL count_partitions             @ 1st recursive call
     POP {R1}                        @ restore orig R1
     PUSH {R0}                       @ preserve call result
-    SBC R2, R2, #1                  @ prepare for 2nd recursive call [count_partitions(n,m-1)]
+    PUSH {R2}                       @ preserve orig OpM to prepare for 2nd recursive call [count_partitions(n,m-1)]
+    SBC R2, R2, #1                  @ prep OpM for 2nd recursive call
     BL count_partitions             @ 2nd recursive call
+    POP {R2}                        @ restore orig OpM
     POP {R1}                        @ R1 = result of 1st recursive call
     ADD R0, R0, R1                  @ add results of both recursive calls into return reg R0
     POP {PC}
@@ -64,8 +67,10 @@ _printf:                            @ needs addr of output string in R0, plus an
     POP {PC}
 
 _exit:                              @die
+    PUSH {R0}
     LDR R0, =out_end_str
     BL _printf
+    POP {R0}
     MOV R7, #1
     SWI 0
     
