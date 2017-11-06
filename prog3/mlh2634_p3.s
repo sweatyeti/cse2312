@@ -1,6 +1,6 @@
 /******************************************************************************
-* @file mlh2634_p2.s
-* @brief Matt Hamrick's CSE 2312-004 Program #2 assignment
+* @file mlh2634_p3.s
+* @brief Matt Hamrick's CSE 2312-004 Program #3 assignment
 * @author Matt Hamrick
 ******************************************************************************/
 
@@ -21,7 +21,13 @@ main:
     MOV R1, R4                      @ R1 = operand N
     MOV R2, R5                      @ R2 = operand M
     BL count_partitions             @ perform partition logic
-    
+    PUSH {R0}
+    LDR R0, =out_result_str         @ load output string addr for printf call
+    POP {R1}                        @ R1 = end result (# of partitions)
+    MOV R2, R4                      @ R2 = operand N
+    MOV R3, R5                      @ R3 = operand M
+    BL _printf                      @ output the result string
+    B main                          @ do it all over
 
     B _exit                         @die (unreachable)
 
@@ -36,12 +42,12 @@ count_partitions:                   @ implement recursive logic for returning th
     MOVEQ R0, #0                    @ if (OpM == 0) then return 0
     POPEQ {PC}
     PUSH {R1}                       @ preserve orig R1 for later use
-    SBC R1, R1, R2                  @ prepare for 1st recursive call [count_partitions(n-m,m)]
+    SUB R1, R1, R2                  @ prepare for 1st recursive call [count_partitions(n-m,m)]
     BL count_partitions             @ 1st recursive call
     POP {R1}                        @ restore orig R1
     PUSH {R0}                       @ preserve call result
     PUSH {R2}                       @ preserve orig OpM to prepare for 2nd recursive call [count_partitions(n,m-1)]
-    SBC R2, R2, #1                  @ prep OpM for 2nd recursive call
+    SUB R2, R2, #1                  @ prep OpM for 2nd recursive call
     BL count_partitions             @ 2nd recursive call
     POP {R2}                        @ restore orig OpM
     POP {R1}                        @ R1 = result of 1st recursive call
