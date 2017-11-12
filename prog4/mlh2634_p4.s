@@ -12,17 +12,23 @@ main:
     BL _printf                      @ prompt user for operand N (OpN)
     LDR R0, =in_operand_format_str
     BL _getOperand                  @ get OpN
-    MOV R4, R0                      @ preserve OpN
+    MOV R4, R0                      @ preserve orig OpN
+    VMOV S14, R0                    @ copy OpN into a VFP register
+    VCVT.F64.S32 D4, S14            @ convert signed int OpN into 64-bit value and store in D4
+    
     LDR R0, =out_operandD_str     
     BL _printf                      @ prompt user for operand D (OpD)
     LDR R0, =in_operand_format_str
     BL _getOperand                  @ get OpD
-    MOV R5, R0                      @ preserve OpD
+    MOV R5, R0                      @ preserve orig OpD
+    VMOV S15, R0                    @ copy OpD into a VFP register
+    VCVT.F64.S32 D5, S15            @ convert signed int OpD into 64-bit value and store in D5
     
-    LDR R0, =out_test_str
-    PUSH {R4-R5}
-    POP {R1-R2}
+    LDR R0, =out_fpTest_str
+    VMOV R2, R3, D4
+    VPUSH {D5}
     BL printf
+    ADD SP, SP, #16
     
     
     
@@ -45,6 +51,12 @@ _printf:                            @ outputs string to the screen using clib pr
     ADD SP, SP, #4
     POP {PC}
     
+_divide:
+    PUSH {LR}
+    
+    
+    POP {PC}
+    
 
 _exit:                              @die
     PUSH {R0}
@@ -61,3 +73,4 @@ out_operandN_str:           .asciz      "Enter an integer numerator then press E
 out_operandD_str:           .asciz      "Enter an integer denominator then press ENTER (operand D):\n"
 in_operand_format_str:      .asciz      "%d"
 out_test_str:               .asciz      "R1: %d, R2: %d\n" @, R3: %d\n"
+out_fpTest_str:             .asciz      "FP values: %f, and %f\n"
