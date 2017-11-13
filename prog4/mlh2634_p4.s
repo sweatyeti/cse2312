@@ -24,7 +24,7 @@ main:
     VMOV S2, R0                     @ copy OpD into a single-precision VFP register
     VCVT.F64.S32 D1, S2             @ convert signed int OpD in S2 into 64-bit value and store in D1
     
-    BL _divide                      @ do the maths - quotient returned in D2
+    BL _divide                      @ do the maths - quotient placed in D2
     
     LDR R0, =out_result_str
     MOV R1, R4                      @ place numerator into R1 for printf call
