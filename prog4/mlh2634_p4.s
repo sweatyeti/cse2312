@@ -14,14 +14,14 @@ main:
     BL _getOperand                  @ get OpN
     MOV R4, R0                      @ preserve orig OpN
     VMOV S0, R0                     @ copy OpN into a VFP register
-    VCVT.F64.S32 D0, S0             @ convert signed int OpN in S1 into 64-bit value and store in D0
+    VCVT.F64.S32 D0, S0             @ convert signed int OpN in S0 into 64-bit value and store in D0
     
     LDR R0, =out_operandD_str     
     BL printf                       @ prompt user for operand D (OpD)
     LDR R0, =in_operand_format_str
     BL _getOperand                  @ get OpD
     MOV R5, R0                      @ preserve orig OpD
-    VMOV S2, R0                     @ copy OpD into a VFP register
+    VMOV S2, R0                     @ copy OpD into a single-precision VFP register
     VCVT.F64.S32 D1, S2             @ convert signed int OpD in S2 into 64-bit value and store in D1
     
     BL _divide                      @ do the maths - quotient returned in D2
@@ -31,7 +31,7 @@ main:
     MOV R2, R5                      @ place denominator into R1 for printf call
     VPUSH {D2}                      @ can use a single printf in this scenario by pushing quotient onto the stack (R3 gets skipped)
     BL printf                       @ output the required result string
-    ADD SP, SP, #8                  @ restore SP to pre-VPUSH location (#8 since VPUSH uses 8 bytes for double precision D2 reg
+    ADD SP, SP, #8                  @ restore SP to pre-VPUSH location (#8 since VPUSH uses 8 bytes for double precision D2 reg)
     
     B main                          @ do it all over
     
