@@ -29,14 +29,13 @@ main:
     LDR R0, =out_result_str
     MOV R1, R4                      @ place numerator into R1 for printf call
     MOV R2, R5                      @ place denominator into R1 for printf call
-    VPUSH {D2}                      @ can use a single printf in this scenario by pushing quotient onto the stack (R3 gets skipped)
-    BL printf                       @ output the required result string
+    VPUSH {D2}                      @ can use a single printf in this scenario by pushing quotient onto the stack (R3 gets skipped, and its value does not matter)
+    BL printf                       @ output the result string
     ADD SP, SP, #8                  @ restore SP to pre-VPUSH location (#8 since VPUSH uses 8 bytes for double precision D2 reg)
     
     B main                          @ do it all over
     
     B _exit                         @ unreachable death
-
 
 _getOperand:                        @ retrieves single operand from user using clib scanf
     PUSH {LR}                       @ needs addr of input format string in R0 to be set by caller beforehand
@@ -46,13 +45,11 @@ _getOperand:                        @ retrieves single operand from user using c
     LDR R0, [SP]
     ADD SP, SP, #4
     POP {PC}
-
     
 _divide:                            @ OpN in D0, OpD in D1
     PUSH {LR}
     VDIV.F64 D2, D0, D1             @ D2 = OpN / OpD
     POP {PC}
-    
 
 _exit:                              @die
     PUSH {R0}                       @ preserve R0 just in case caller is passing anything in it
@@ -64,11 +61,8 @@ _exit:                              @die
     
 
 .data
-out_end_str:                .asciz      "terminating prog..\n"
 out_operandN_str:           .asciz      "Enter an integer numerator then press ENTER (operand N):\n"
 out_operandD_str:           .asciz      "Enter an integer denominator then press ENTER (operand D):\n"
 in_operand_format_str:      .asciz      "%d"
-out_test_str:               .asciz      "R1: %d, R2: %d\n" @, R3: %d\n"
-out_fpTest_str:             .asciz      "FP values: %f, and %f\n"
-out_singFpTest_str:         .asciz      "%f\n"
 out_result_str:             .asciz      "%d / %d = %f\n\n"
+out_end_str:                .asciz      "terminating prog..\n"
