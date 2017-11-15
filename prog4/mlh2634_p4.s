@@ -9,7 +9,7 @@
 
 main:
     LDR R0, =out_operandN_str
-    BL printf                       @ prompt user for operand N (OpN)
+    BL printf                       @ display prompt for operand N (OpN) input
     LDR R0, =in_operand_format_str
     BL _getOperand                  @ get OpN
     MOV R4, R0                      @ preserve orig OpN
@@ -17,7 +17,7 @@ main:
     VCVT.F64.S32 D0, S0             @ convert signed int OpN in S0 into 64-bit value and store in D0
     
     LDR R0, =out_operandD_str     
-    BL printf                       @ prompt user for operand D (OpD)
+    BL printf                       @ display prompt for operand D (OpD) input
     LDR R0, =in_operand_format_str
     BL _getOperand                  @ get OpD
     MOV R5, R0                      @ preserve orig OpD
@@ -28,12 +28,12 @@ main:
     
     LDR R0, =out_result_str
     MOV R1, R4                      @ place numerator into R1 for printf call
-    MOV R2, R5                      @ place denominator into R1 for printf call
+    MOV R2, R5                      @ place denominator into R2 for printf call
     VPUSH {D2}                      @ can use a single printf in this scenario by pushing quotient onto the stack (R3 gets skipped, and its value does not matter)
-    BL printf                       @ output the result string
+    BL printf                       @ output the result string with clib printf
     ADD SP, SP, #8                  @ restore SP to pre-VPUSH location (#8 since VPUSH uses 8 bytes for double precision D2 reg)
     
-    B main                          @ do it all over
+    B main                          @ do it all over (forever falling down stairs)
     
     B _exit                         @ unreachable death
 
@@ -47,9 +47,8 @@ _getOperand:                        @ retrieves single operand from user using c
     POP {PC}
     
 _divide:                            @ OpN in D0, OpD in D1
-    PUSH {LR}
     VDIV.F64 D2, D0, D1             @ D2 = OpN / OpD
-    POP {PC}
+    MOV PC, LR
 
 _exit:                              @die
     PUSH {R0}                       @ preserve R0 just in case caller is passing anything in it
