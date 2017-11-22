@@ -90,7 +90,7 @@ _exit:                              @die
 .data
 arr:                        .skip       40
 out_prompt_str:             .asciz      "Enter 10 positive integers, each followed by ENTER:\n"
-out_arrVal_str:            .asciz      "array_a[%d] = %d\n"
+out_arrVal_str:             .asciz      "array_a[%d] = %d\n"
 out_search_str:             .asciz      "ENTER A SEARCH VALUE: "
 out_noSrchRslt_str:         .asciz      "That value does not exist in the array!\n"
 out_end_str:                .asciz      "terminating prog..\n"
