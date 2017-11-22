@@ -11,9 +11,9 @@ main:
     LDR R0, =out_prompt_str         @ load addr of prompt string for impending printf call
     BL printf
     MOV R5, #0                      @ init counter for _createarray loop
-_populateArray:
+_populateArr:
     CMP R5, #10                     @ check counter to see if the loop is finished
-    BEQ _createarraydone            @ if finished, exit loop
+    BEQ _populateArrDone            @ if finished, exit loop
     LDR R1, =arr                    @ load R1 with pointer to arr
     LSL R2, R5, #2                  @ multiply counter*4, product = the array offset
     ADD R2, R1, R2                  @ R2 = address of a + array offset
@@ -21,10 +21,9 @@ _populateArray:
     LDR R0, =in_value_format_str    @ load addr of input operand string for impending scanf call
     BL _getValue                    @ get value from user to populate array
     POP {R2}                        @ restore curent array pointer to R2
-    STR R0, [R2]                    @ store rand# to array location
+    STR R0, [R2]                    @ store input value to array location
     ADD R5, R5, #1                  @ increment counter
-    B _populateArray                @ loop back
-
+    B _populateArr                  @ loop back
 
     B _exit
     
@@ -36,6 +35,22 @@ _getValue:                          @ retrieves single operand from user using c
     LDR R0, [SP]
     ADD SP, SP, #4
     POP {PC}
+
+_populateArrDone:
+    MOV R5, #0                      @ reset counter back to zero for iteration
+_iterateArr:
+    CMP R5, #10                     @ check counter to see if the loop is finished
+    BEQ _exit             @ if finished, exit loop
+    LDR R1, =arr                    @ load R1 with pointer to arr
+    LSL R2, R5, #2                  @ multiply counter*4, product = the array offset
+    ADD R2, R1, R2                  @ R2 = address of a + array offset
+    LDR R3, [R2]                    @ R3 = the value stored at the memory address in R2  
+    LDR R0, =out_arrVals_str        @ R0 = addr of output string to prepare for printf
+    MOV R1, R5                      @ load the counter into R1 to prepare for printf
+    MOV R2, R3                      @ load the value into R2 to prepare for printf
+    BL printf                       @ print the things
+    ADD R5, R5, #1                  @ increment counter
+    B _iterateArr                   @ loop back
     
 _exit:                              @die
     PUSH {R0}                       @ preserve R0 just in case caller is passing anything in it
@@ -48,5 +63,8 @@ _exit:                              @die
 .data
 arr:                        .skip       40
 out_prompt_str:             .asciz      "Enter 10 positive integers, each followed by ENTER:\n"
-in_value_format_str:        .asciz      "%d"
+out_arrVals_str:            .asciz      "array_a[%d] = %d\n"
+out_search_str:             .asciz      "ENTER A SEARCH VALUE: "
+out_noSrchRslt_str:         .asciz      "That value does not exist in the array!\n"
 out_end_str:                .asciz      "terminating prog..\n"
+in_value_format_str:        .asciz      "%d"
