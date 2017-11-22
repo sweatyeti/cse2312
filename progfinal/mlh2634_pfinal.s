@@ -4,6 +4,8 @@
 * @author Matt Hamrick
 ******************************************************************************/
 
+@ TODO: Consolidate repeated iteration/search code
+
 .global main
 .func main
 
