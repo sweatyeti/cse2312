@@ -4,6 +4,8 @@
 * @author Matt Hamrick
 ******************************************************************************/
 
+@ requires compilation via gcc, since clib functions are utilized
+
 .global main
 .func main
 
